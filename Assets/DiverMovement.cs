@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -20,6 +21,12 @@ public class DiverMovement : MonoBehaviour
         rb.linearDamping = drag;
 
         controls = new InputActions();
+
+        controls.Player.Signal.performed += ctx => OnSignal();
+    }
+
+    private void Start()
+    {
     }
 
     void OnEnable()
@@ -54,6 +61,14 @@ public class DiverMovement : MonoBehaviour
         {
             float angle = Mathf.Atan2(rb.linearVelocity.y, rb.linearVelocity.x) * Mathf.Rad2Deg;
             rb.rotation = angle;
+        }
+    }
+    
+    void OnSignal()
+    {
+        if (LevelManager.instance != null && LevelManager.instance.canUseSignal)
+        {
+            LevelManager.instance.MakeSignal();
         }
     }
 }
