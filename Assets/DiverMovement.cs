@@ -9,6 +9,8 @@ public class DiverMovement : MonoBehaviour
     public float maxSpeed = 5f;
     public float drag = 2f;
 
+    public int signalCount = 3;
+
     private Rigidbody2D rb;
     private Vector2 input;
 
@@ -66,9 +68,16 @@ public class DiverMovement : MonoBehaviour
     
     void OnSignal()
     {
-        if (LevelManager.instance != null && LevelManager.instance.canUseSignal)
+        if (LevelManager.instance != null && LevelManager.instance.canUseSignal && signalCount > 0)
         {
             LevelManager.instance.MakeSignal();
+            signalCount--;
         }
+    }
+
+    public void TakeSignalBonus()
+    {
+        // Проиграть звук поднятия бонуса
+        signalCount++;
     }
 }

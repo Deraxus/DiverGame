@@ -7,6 +7,14 @@ public class PuzirSpawner : MonoBehaviour
     public float spawnPeriod = 0.5f;
     public GameObject puzirPrefab;
 
+    public enum Direction
+    {
+        LeftRight,
+        DownUp
+    }
+
+    public Direction directionType;
+
     public float puzirRazbros = 1f;
     void Start()
     {
@@ -31,7 +39,24 @@ public class PuzirSpawner : MonoBehaviour
 
     public void PuzirSpawn(Vector2 spawnPosition)
     {
-        spawnPosition = new Vector2(Random.Range(-puzirRazbros, puzirRazbros) + spawnPosition.x, spawnPosition.y);
-        Instantiate(puzirPrefab, spawnPosition, Quaternion.identity);
+        if (directionType == Direction.DownUp)
+        {
+            spawnPosition = new Vector2(Random.Range(-puzirRazbros, puzirRazbros) + spawnPosition.x, spawnPosition.y);   
+        }
+
+        if (directionType == Direction.LeftRight)
+        {
+            spawnPosition = new Vector2(spawnPosition.x, Random.Range(-puzirRazbros, puzirRazbros) + spawnPosition.y);
+        }
+        GameObject spawnedPuzir = Instantiate(puzirPrefab, spawnPosition, Quaternion.identity);
+        if (directionType == Direction.LeftRight)
+        {
+            spawnedPuzir.GetComponent<PuzirLogic>().directionType = Direction.LeftRight;
+        }
+
+        if (directionType == Direction.DownUp)
+        {
+            spawnedPuzir.GetComponent<PuzirLogic>().directionType = Direction.DownUp;
+        }
     }
 }

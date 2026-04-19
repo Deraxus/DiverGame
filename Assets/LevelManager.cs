@@ -10,30 +10,30 @@ public class LevelManager : MonoBehaviour
 
     public float minSize = 2f;
     public float maxSize = 6f;
-    public float signalDuration = 2f;
-    public float pauseDuration = 5f;
+    public float signalDuration = 1.5f;
+    public float pauseDuration = 1f;
+
+    public float startIntensity = 1f;
+    public float endIntensity = 0f;
 
     public bool canUseSignal = true;
+
     void Start()
     {
         instance = this;
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        light2D.pointLightInnerRadius = minSize;
+        light2D.pointLightOuterRadius = minSize;
+        light2D.intensity = 0f;
     }
 
     public void GameOver()
     {
-        // Затемнение экрана
         SceneManager.LoadScene("Level1");
     }
 
     public void GameFinished()
     {
-        
     }
 
     public void MenuReturn()
@@ -43,45 +43,71 @@ public class LevelManager : MonoBehaviour
 
     public void MakeSignal()
     {
-        // Проиграть звук
-        // Осветить локацию
+        if (!canUseSignal)
+            return;
+
         StartCoroutine(PulseRoutine());
     }
-    
+
     IEnumerator PulseRoutine()
     {
         canUseSignal = false;
-        // УВЕЛИЧЕНИЕ
-        yield return StartCoroutine(LerpLight(minSize, maxSize, signalDuration));
 
-        // ПАУЗА
+        light2D.pointLightInnerRadius = minSize;
+        light2D.pointLightOuterRadius = minSize;
+        light2D.intensity = startIntensity;
+
+        yield return StartCoroutine(ExpandSignal());
         yield return new WaitForSeconds(pauseDuration);
+        yield return StartCoroutine(FadeSignalOut());
 
-        // УМЕНЬШЕНИЕ
-        yield return StartCoroutine(LerpLight(maxSize, minSize, signalDuration, true));
+        light2D.pointLightInnerRadius = minSize;
+        light2D.pointLightOuterRadius = minSize;
+        light2D.intensity = 0f;
+
+        canUseSignal = true;
     }
-    
-    IEnumerator LerpLight(float start, float end, float duration, bool changeSignal = false)
+
+    IEnumerator ExpandSignal()
     {
         float time = 0f;
 
-        while (time < duration)
+        while (time < signalDuration)
         {
-            float t = time / duration;
+            float t = time / signalDuration;
 
-            light2D.pointLightInnerRadius = Mathf.Lerp(start, end, t);
-            light2D.pointLightOuterRadius = Mathf.Lerp(start, end, t);
+            light2D.pointLightInnerRadius = 0f;
+            light2D.pointLightOuterRadius = Mathf.Lerp(minSize, maxSize, t);
+            light2D.intensity = startIntensity;
 
             time += Time.deltaTime;
             yield return null;
         }
 
-        // чтобы точно дошло до конца
-        light2D.pointLightOuterRadius = end;
-        if (changeSignal)
-        {
-            canUseSignal = !canUseSignal;
-        }
+        light2D.pointLightInnerRadius = 0f;
+        light2D.pointLightOuterRadius = maxSize;
+        light2D.intensity = startIntensity;
     }
-    
+
+    IEnumerator FadeSignalOut()
+    {
+        float time = 0f;
+        float extraDistance = maxSize - minSize;
+
+        while (time < signalDuration)
+        {
+            float t = time / signalDuration;
+
+            light2D.pointLightInnerRadius = Mathf.Lerp(0f, maxSize, t);
+            light2D.pointLightOuterRadius = Mathf.Lerp(maxSize, maxSize + extraDistance, t);
+            light2D.intensity = Mathf.Lerp(startIntensity, endIntensity, t);
+
+            time += Time.deltaTime;
+            yield return null;
+        }
+
+        light2D.pointLightInnerRadius = maxSize + extraDistance;
+        light2D.pointLightOuterRadius = maxSize + extraDistance;
+        light2D.intensity = endIntensity;
+    }
 }
