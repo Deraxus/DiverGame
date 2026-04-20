@@ -1,30 +1,41 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class LevelManager : MonoBehaviour
 {
     public static LevelManager instance;
-    public Light2D light2D;
 
-    public float minSize = 2f;
-    public float maxSize = 6f;
-    public float signalDuration = 1.5f;
-    public float pauseDuration = 1f;
+    [Header("Signal Light")]
+    public Light2D signalLight;
 
-    public float startIntensity = 1f;
-    public float endIntensity = 0f;
+    [Header("Signal Settings")]
+    public float minRadius = 0f;
+    public float maxRadius = 12f;
+    public float expandDuration = 1f;
+    public float holdDuration = 1.5f;
+    public float shrinkDuration = 1f;
+    public float signalIntensity = 1f;
 
+    [Header("State")]
     public bool canUseSignal = true;
 
-    void Start()
+    [Header("UI")]
+    public List<Image> bonusesUI = new List<Image>();
+
+    private Coroutine signalCoroutine;
+
+    private void Awake()
     {
         instance = this;
+    }
 
-        light2D.pointLightInnerRadius = minSize;
-        light2D.pointLightOuterRadius = minSize;
-        light2D.intensity = 0f;
+    private void Start()
+    {
+        ResetSignalLight();
     }
 
     public void GameOver()
@@ -46,68 +57,118 @@ public class LevelManager : MonoBehaviour
         if (!canUseSignal)
             return;
 
-        StartCoroutine(PulseRoutine());
+        if (signalCoroutine != null)
+        {
+            StopCoroutine(signalCoroutine);
+        }
+
+        signalCoroutine = StartCoroutine(SignalRoutine());
     }
 
-    IEnumerator PulseRoutine()
+    public Image ChooseLastActiveBonus()
+    {
+        for (int i = bonusesUI.Count - 1; i >= 0; i--)
+        {
+            if (bonusesUI[i] != null && bonusesUI[i].gameObject.activeInHierarchy)
+            {
+                return bonusesUI[i];
+            }
+        }
+
+        return null;
+    }
+
+    public Image ChooseLastNonActiveBonus()
+    {
+        for (int i = 0; i < bonusesUI.Count; i++)
+        {
+            if (bonusesUI[i] != null && !bonusesUI[i].gameObject.activeInHierarchy)
+            {
+                return bonusesUI[i];
+            }
+        }
+
+        return null;
+    }
+
+    private IEnumerator SignalRoutine()
     {
         canUseSignal = false;
 
-        light2D.pointLightInnerRadius = minSize;
-        light2D.pointLightOuterRadius = minSize;
-        light2D.intensity = startIntensity;
+        signalLight.enabled = true;
+        signalLight.intensity = signalIntensity;
+        signalLight.pointLightInnerRadius = 0f;
+        signalLight.pointLightOuterRadius = minRadius;
 
         yield return StartCoroutine(ExpandSignal());
-        yield return new WaitForSeconds(pauseDuration);
-        yield return StartCoroutine(FadeSignalOut());
+        yield return new WaitForSeconds(holdDuration);
+        yield return StartCoroutine(ShrinkSignal());
 
-        light2D.pointLightInnerRadius = minSize;
-        light2D.pointLightOuterRadius = minSize;
-        light2D.intensity = 0f;
+        ResetSignalLight();
 
         canUseSignal = true;
+        signalCoroutine = null;
     }
 
-    IEnumerator ExpandSignal()
+    private IEnumerator ExpandSignal()
     {
         float time = 0f;
 
-        while (time < signalDuration)
+        while (time < expandDuration)
         {
-            float t = time / signalDuration;
+            float t = time / expandDuration;
+            t = SmoothStep(t);
 
-            light2D.pointLightInnerRadius = 0f;
-            light2D.pointLightOuterRadius = Mathf.Lerp(minSize, maxSize, t);
-            light2D.intensity = startIntensity;
+            float radius = Mathf.Lerp(minRadius, maxRadius, t);
+
+            signalLight.pointLightInnerRadius = 0f;
+            signalLight.pointLightOuterRadius = radius;
+            signalLight.intensity = signalIntensity;
 
             time += Time.deltaTime;
             yield return null;
         }
 
-        light2D.pointLightInnerRadius = 0f;
-        light2D.pointLightOuterRadius = maxSize;
-        light2D.intensity = startIntensity;
+        signalLight.pointLightInnerRadius = 0f;
+        signalLight.pointLightOuterRadius = maxRadius;
+        signalLight.intensity = signalIntensity;
     }
 
-    IEnumerator FadeSignalOut()
+    private IEnumerator ShrinkSignal()
     {
         float time = 0f;
-        float extraDistance = maxSize - minSize;
 
-        while (time < signalDuration)
+        while (time < shrinkDuration)
         {
-            float t = time / signalDuration;
+            float t = time / shrinkDuration;
+            t = SmoothStep(t);
 
-            light2D.pointLightInnerRadius = Mathf.Lerp(0f, maxSize, t);
-            light2D.pointLightOuterRadius = Mathf.Lerp(maxSize, maxSize + extraDistance, t);
-            light2D.intensity = Mathf.Lerp(startIntensity, endIntensity, t);
+            float radius = Mathf.Lerp(maxRadius, minRadius, t);
+
+            signalLight.pointLightInnerRadius = 0f;
+            signalLight.pointLightOuterRadius = radius;
+            signalLight.intensity = signalIntensity;
 
             time += Time.deltaTime;
             yield return null;
         }
 
-        light2D.pointLightInnerRadius = maxSize + extraDistance;
-        light2D.pointLightOuterRadius = maxSize + extraDistance;
-        light2D.intensity = endIntensity;
+        signalLight.pointLightInnerRadius = 0f;
+        signalLight.pointLightOuterRadius = minRadius;
+        signalLight.intensity = signalIntensity;
+    }
+
+    private void ResetSignalLight()
+    {
+        signalLight.pointLightInnerRadius = 0f;
+        signalLight.pointLightOuterRadius = 0f;
+        signalLight.intensity = 0f;
+        signalLight.enabled = false;
+    }
+
+    private float SmoothStep(float t)
+    {
+        t = Mathf.Clamp01(t);
+        return t * t * (3f - 2f * t);
     }
 }

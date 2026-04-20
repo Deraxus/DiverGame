@@ -10,7 +10,9 @@ public class PuzirSpawner : MonoBehaviour
     public enum Direction
     {
         LeftRight,
-        DownUp
+        DownUp,
+        RightLeft,
+        UpDown,
     }
 
     public Direction directionType;
@@ -57,6 +59,16 @@ public class PuzirSpawner : MonoBehaviour
         if (directionType == Direction.DownUp)
         {
             spawnedPuzir.GetComponent<PuzirLogic>().directionType = Direction.DownUp;
+        }
+        
+        if (directionType == Direction.RightLeft)
+        {
+            spawnedPuzir.GetComponent<PuzirLogic>().directionType = Direction.RightLeft;
+        }
+
+        if (directionType == Direction.UpDown)
+        {
+            spawnedPuzir.GetComponent<PuzirLogic>().directionType = Direction.UpDown;
         }
     }
 }

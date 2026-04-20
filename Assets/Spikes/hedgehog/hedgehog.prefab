@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6105746905925118859}
   - component: {fileID: 7865753657679127034}
   - component: {fileID: 1454478511925175070}
+  - component: {fileID: 5320612477268594413}
   m_Layer: 0
   m_Name: hedgehog
   m_TagString: Untagged
@@ -383,6 +384,18 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &5320612477268594413
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3675575643107532175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38b99fc7046c60c4cae6403eac197c36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::spikeLogic
 --- !u!1 &4460348929108053160
 GameObject:
   m_ObjectHideFlags: 0

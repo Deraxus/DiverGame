@@ -1,6 +1,10 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class DiverMovement : MonoBehaviour
@@ -11,10 +15,16 @@ public class DiverMovement : MonoBehaviour
 
     public int signalCount = 3;
 
+    [Header("Invulnerability")]
+    public float invulnerabilityDuration = 3f;
+    public float blinkInterval = 0.15f;
+
+    [HideInInspector] public bool isInvulnerable = false;
+
     private Rigidbody2D rb;
     private Vector2 input;
-
     private InputActions controls;
+    private SpriteRenderer spriteRenderer;
 
     void Awake()
     {
@@ -23,12 +33,9 @@ public class DiverMovement : MonoBehaviour
         rb.linearDamping = drag;
 
         controls = new InputActions();
+        controls.Player.Signal.started += ctx => OnSignal();
 
-        controls.Player.Signal.performed += ctx => OnSignal();
-    }
-
-    private void Start()
-    {
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
     }
 
     void OnEnable()
@@ -58,26 +65,93 @@ public class DiverMovement : MonoBehaviour
             }
         }
 
-        // поворот
         if (rb.linearVelocity.magnitude > 0.1f)
         {
             float angle = Mathf.Atan2(rb.linearVelocity.y, rb.linearVelocity.x) * Mathf.Rad2Deg;
             rb.rotation = angle;
         }
     }
-    
-    void OnSignal()
+
+    public void OnSignal()
     {
         if (LevelManager.instance != null && LevelManager.instance.canUseSignal && signalCount > 0)
         {
+            SpendSignal();
             LevelManager.instance.MakeSignal();
-            signalCount--;
+        }
+    }
+
+    public void TakeDamageOrUseSignal()
+    {
+        if (isInvulnerable)
+            return;
+
+        if (signalCount > 0)
+        {
+            SpendSignal();
+            StartCoroutine(InvulnerabilityCoroutine());
+            return;
+        }
+
+        if (LevelManager.instance != null)
+        {
+            LevelManager.instance.GameOver();
+        }
+    }
+
+    private void SpendSignal()
+    {
+        signalCount--;
+
+        if (LevelManager.instance != null)
+        {
+            Image bonusImage = LevelManager.instance.ChooseLastActiveBonus();
+            if (bonusImage != null)
+            {
+                bonusImage.gameObject.SetActive(false);
+            }
         }
     }
 
     public void TakeSignalBonus()
     {
-        // Проиграть звук поднятия бонуса
         signalCount++;
+
+        if (LevelManager.instance != null)
+        {
+            Image bonusImage = LevelManager.instance.ChooseLastNonActiveBonus();
+            if (bonusImage != null)
+            {
+                bonusImage.gameObject.SetActive(true);
+            }
+        }
+    }
+
+    private System.Collections.IEnumerator InvulnerabilityCoroutine()
+    {
+        isInvulnerable = true;
+
+        float time = 0f;
+        bool visible = true;
+
+        while (time < invulnerabilityDuration)
+        {
+            visible = !visible;
+
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.enabled = visible;
+            }
+
+            yield return new WaitForSeconds(blinkInterval);
+            time += blinkInterval;
+        }
+
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.enabled = true;
+        }
+
+        isInvulnerable = false;
     }
 }
