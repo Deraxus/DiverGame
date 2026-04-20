@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 7028727361637650282}
   m_Layer: 0
   m_Name: fish
-  m_TagString: Untagged
+  m_TagString: spike
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -110,7 +110,7 @@ MonoBehaviour:
   - {fileID: -2813018780441384223, guid: 2f288cd380127415b95de2cd81d84882, type: 3}
   - {fileID: 1802435533684377796, guid: 2f288cd380127415b95de2cd81d84882, type: 3}
   - {fileID: -5025880600877718823, guid: 2f288cd380127415b95de2cd81d84882, type: 3}
-  speed: 1
+  baseSpeed: 1
   directionType: 0
 --- !u!50 &3542826830708391432
 Rigidbody2D:

@@ -26,6 +26,8 @@ public class DiverMovement : MonoBehaviour
     private InputActions controls;
     private SpriteRenderer spriteRenderer;
 
+    public static DiverMovement instance;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -36,6 +38,11 @@ public class DiverMovement : MonoBehaviour
         controls.Player.Signal.started += ctx => OnSignal();
 
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+    }
+
+    private void Start()
+    {
+        instance = this;
     }
 
     void OnEnable()
