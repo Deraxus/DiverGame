@@ -11,6 +11,8 @@ public class spikeLogic : MonoBehaviour
     {
         TryDamage(other.gameObject);
     }
+    
+    
 
     private void TryDamage(GameObject obj)
     {

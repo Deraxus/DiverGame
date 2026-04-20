@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class PuzirSpawner : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     public float spawnPeriod = 0.5f;
     public GameObject puzirPrefab;
 
@@ -16,59 +15,60 @@ public class PuzirSpawner : MonoBehaviour
     }
 
     public Direction directionType;
-
     public float puzirRazbros = 1f;
-    void Start()
+
+    [Header("Rotation")]
+    public float spawnAngle = 0f;
+
+    private void Start()
     {
         StartCoroutine(SpawnPuzir());
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-
-    IEnumerator SpawnPuzir()
+    private IEnumerator SpawnPuzir()
     {
         while (true)
         {
             yield return new WaitForSeconds(spawnPeriod);
-            PuzirSpawn(transform.position);   
+            PuzirSpawn(transform.position);
         }
     }
 
     public void PuzirSpawn(Vector2 spawnPosition)
     {
-        if (directionType == Direction.DownUp)
+        if (directionType == Direction.DownUp || directionType == Direction.UpDown)
         {
-            spawnPosition = new Vector2(Random.Range(-puzirRazbros, puzirRazbros) + spawnPosition.x, spawnPosition.y);   
+            spawnPosition = new Vector2(
+                spawnPosition.x + Random.Range(-puzirRazbros, puzirRazbros),
+                spawnPosition.y
+            );
         }
 
-        if (directionType == Direction.LeftRight)
+        if (directionType == Direction.LeftRight || directionType == Direction.RightLeft)
         {
-            spawnPosition = new Vector2(spawnPosition.x, Random.Range(-puzirRazbros, puzirRazbros) + spawnPosition.y);
-        }
-        GameObject spawnedPuzir = Instantiate(puzirPrefab, spawnPosition, Quaternion.identity);
-        if (directionType == Direction.LeftRight)
-        {
-            spawnedPuzir.GetComponent<PuzirLogic>().directionType = Direction.LeftRight;
+            spawnPosition = new Vector2(
+                spawnPosition.x,
+                spawnPosition.y + Random.Range(-puzirRazbros, puzirRazbros)
+            );
         }
 
-        if (directionType == Direction.DownUp)
+        Quaternion spawnRotation;
+
+        if (Mathf.Approximately(spawnAngle, 0f))
         {
-            spawnedPuzir.GetComponent<PuzirLogic>().directionType = Direction.DownUp;
+            spawnRotation = puzirPrefab.transform.rotation;
         }
-        
-        if (directionType == Direction.RightLeft)
+        else
         {
-            spawnedPuzir.GetComponent<PuzirLogic>().directionType = Direction.RightLeft;
+            spawnRotation = Quaternion.Euler(0f, 0f, spawnAngle);
         }
 
-        if (directionType == Direction.UpDown)
+        GameObject spawnedPuzir = Instantiate(puzirPrefab, spawnPosition, spawnRotation);
+
+        PuzirLogic puzirLogic = spawnedPuzir.GetComponent<PuzirLogic>();
+        if (puzirLogic != null)
         {
-            spawnedPuzir.GetComponent<PuzirLogic>().directionType = Direction.UpDown;
+            puzirLogic.directionType = directionType;
         }
     }
 }
