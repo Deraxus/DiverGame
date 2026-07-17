@@ -4,6 +4,8 @@ public class signalBonusLogic : MonoBehaviour
 {
     public float amplitude = 0.3f;
     public float frequency = 1f;
+    
+    public AudioClip onTakenSound;
 
     private Vector3 startPos;
 
@@ -28,6 +30,7 @@ public class signalBonusLogic : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             other.GetComponent<DiverMovement>().TakeSignalBonus();
+            AudioManager.instance.PlaySound(onTakenSound);
             Destroy(gameObject);
         }
     }

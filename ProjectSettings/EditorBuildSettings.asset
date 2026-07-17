@@ -14,5 +14,11 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Level1.unity
     guid: 43f27f4108ca42179f3fafea340db7d6
+  - enabled: 1
+    path: Assets/Scenes/Dying.unity
+    guid: e0960196cfdade044915c510fba6ccc8
+  - enabled: 1
+    path: Assets/Scenes/Win.unity
+    guid: 78a32ac9e9f6ddf4a9f3dfa246718c9d
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 3590b91b4603b465dbb4216d601bff33, type: 3}

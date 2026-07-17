@@ -13,8 +13,8 @@ public class LevelManager : MonoBehaviour
     public Light2D signalLight;
 
     [Header("Signal Settings")]
-    public float minRadius = 0f;
-    public float maxRadius = 12f;
+    public float minScale = 0f;
+    public float maxScale = 12f;
     public float expandDuration = 1f;
     public float holdDuration = 1.5f;
     public float shrinkDuration = 1f;
@@ -40,7 +40,10 @@ public class LevelManager : MonoBehaviour
 
     public void GameOver()
     {
-        SceneManager.LoadScene("Level1");
+        AudioManager.instance.GetComponent<AudioSource>().Stop();
+        AudioManager.instance.firstsource.Stop();
+        AudioManager.instance.secondsource.Stop();
+        SceneManager.LoadScene("Dying");
     }
 
     public void GameFinished()
@@ -52,7 +55,7 @@ public class LevelManager : MonoBehaviour
         SceneManager.LoadScene("MainMenu");
     }
 
-    public void MakeSignal()
+    public void MakeSignal(bool isLevelEnd = false)
     {
         if (!canUseSignal)
             return;
@@ -62,7 +65,7 @@ public class LevelManager : MonoBehaviour
             StopCoroutine(signalCoroutine);
         }
 
-        signalCoroutine = StartCoroutine(SignalRoutine());
+        signalCoroutine = StartCoroutine(SignalRoutine(isLevelEnd));
     }
 
     public Image ChooseLastActiveBonus()
@@ -91,46 +94,54 @@ public class LevelManager : MonoBehaviour
         return null;
     }
 
-    private IEnumerator SignalRoutine()
+    private IEnumerator SignalRoutine(bool isLevelEnd)
     {
         canUseSignal = false;
 
         signalLight.enabled = true;
         signalLight.intensity = signalIntensity;
-        signalLight.pointLightInnerRadius = 0f;
-        signalLight.pointLightOuterRadius = minRadius;
+        signalLight.transform.localScale = Vector3.one * minScale;
 
-        yield return StartCoroutine(ExpandSignal());
-        yield return new WaitForSeconds(holdDuration);
-        yield return StartCoroutine(ShrinkSignal());
+        yield return StartCoroutine(ExpandSignal(isLevelEnd ? 3f : 1f));
 
-        ResetSignalLight();
+        if (!isLevelEnd)
+        {
+            yield return new WaitForSeconds(holdDuration);
+            yield return StartCoroutine(ShrinkSignal());
 
-        canUseSignal = true;
-        signalCoroutine = null;
+            ResetSignalLight();
+            canUseSignal = true;
+            signalCoroutine = null;
+        }
+        else
+        {
+            signalLight.transform.localScale = Vector3.one * maxScale;
+            signalLight.intensity = signalIntensity;
+
+            signalCoroutine = null;
+        }
     }
 
-    private IEnumerator ExpandSignal()
+    private IEnumerator ExpandSignal(float durationMultiplier = 1f)
     {
         float time = 0f;
+        float targetDuration = expandDuration * durationMultiplier;
 
-        while (time < expandDuration)
+        while (time < targetDuration)
         {
-            float t = time / expandDuration;
+            float t = time / targetDuration;
             t = SmoothStep(t);
 
-            float radius = Mathf.Lerp(minRadius, maxRadius, t);
+            float currentScale = Mathf.Lerp(minScale, maxScale, t);
 
-            signalLight.pointLightInnerRadius = 0f;
-            signalLight.pointLightOuterRadius = radius;
+            signalLight.transform.localScale = Vector3.one * currentScale;
             signalLight.intensity = signalIntensity;
 
             time += Time.deltaTime;
             yield return null;
         }
 
-        signalLight.pointLightInnerRadius = 0f;
-        signalLight.pointLightOuterRadius = maxRadius;
+        signalLight.transform.localScale = Vector3.one * maxScale;
         signalLight.intensity = signalIntensity;
     }
 
@@ -143,25 +154,22 @@ public class LevelManager : MonoBehaviour
             float t = time / shrinkDuration;
             t = SmoothStep(t);
 
-            float radius = Mathf.Lerp(maxRadius, minRadius, t);
+            float currentScale = Mathf.Lerp(maxScale, minScale, t);
 
-            signalLight.pointLightInnerRadius = 0f;
-            signalLight.pointLightOuterRadius = radius;
+            signalLight.transform.localScale = Vector3.one * currentScale;
             signalLight.intensity = signalIntensity;
 
             time += Time.deltaTime;
             yield return null;
         }
 
-        signalLight.pointLightInnerRadius = 0f;
-        signalLight.pointLightOuterRadius = minRadius;
+        signalLight.transform.localScale = Vector3.one * minScale;
         signalLight.intensity = signalIntensity;
     }
 
     private void ResetSignalLight()
     {
-        signalLight.pointLightInnerRadius = 0f;
-        signalLight.pointLightOuterRadius = 0f;
+        signalLight.transform.localScale = Vector3.one * minScale;
         signalLight.intensity = 0f;
         signalLight.enabled = false;
     }

@@ -13,7 +13,13 @@ public class DiverMovement : MonoBehaviour
     public float maxSpeed = 5f;
     public float drag = 2f;
 
+    public AudioClip damageSound;
+    public AudioClip noSignalsSound;
+    public AudioClip makeSignalSound;
+
     public int signalCount = 3;
+
+    public bool gameEnding = false;
 
     [Header("Invulnerability")]
     public float invulnerabilityDuration = 3f;
@@ -79,12 +85,17 @@ public class DiverMovement : MonoBehaviour
         }
     }
 
-    public void OnSignal()
+    public void OnSignal(bool isLastBonus = false)
     {
-        if (LevelManager.instance != null && LevelManager.instance.canUseSignal && signalCount > 0)
+        if ((LevelManager.instance != null && LevelManager.instance.canUseSignal && signalCount > 0) || (isLastBonus))
         {
             SpendSignal();
-            LevelManager.instance.MakeSignal();
+            AudioManager.instance.PlaySound(makeSignalSound);
+            LevelManager.instance.MakeSignal(isLastBonus);
+        }
+        else if (signalCount <= 0)
+        {
+            AudioManager.instance.PlaySound(noSignalsSound);
         }
     }
 

@@ -1,11 +1,13 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public Image guide;
+    public static MenuManager instance;
+    void Awake()
     {
-        
+        instance = this;
     }
 
     // Update is called once per frame
@@ -16,6 +18,13 @@ public class MenuManager : MonoBehaviour
     
     public void PlayGame()
     {
-        SceneFader.instance.FadeToScene("Level1");
+        SceneFader.instance.ShowGuideThenLoad(guide, "Level1", 10f);
     }
+
+    public void QuitGame()
+    {
+        SceneFader.instance.FadeToScene("quit");
+        Application.Quit();
+    }
+    
 }

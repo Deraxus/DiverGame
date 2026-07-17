@@ -20,7 +20,10 @@ public class spikeLogic : MonoBehaviour
 
         if (player == null)
             return;
-
+        if (!DiverMovement.instance.isInvulnerable)
+        {
+            AudioManager.instance.PlaySound(DiverMovement.instance.damageSound);   
+        }
         player.TakeDamageOrUseSignal();
     }
 }

@@ -112,6 +112,32 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -120,11 +146,11 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 329
-        y: 954
+        y: 956
         width: 2186
         height: 1067
       alignment: 9
-      pivot: {x: 0.9237934, y: 0.4157049}
+      pivot: {x: 0.8750381, y: 0.4122001}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -141,12 +167,12 @@ TextureImporter:
       name: IMG_4964_1
       rect:
         serializedVersion: 2
-        x: 601
+        x: 603
         y: 15
         width: 1792
         height: 795
       alignment: 9
-      pivot: {x: 0.9132422, y: 0.39817774}
+      pivot: {x: 0.87567914, y: 0.40052977}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []

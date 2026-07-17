@@ -17,8 +17,14 @@ public class LastBonus : MonoBehaviour
 
     public void OnLastBonusTaken()
     {
-        DiverMovement.instance.OnSignal();
-        FishMouth.instance.CloseMouth(-8);
+        AudioManager.instance.secondsource.Stop();
+        DiverMovement.instance.signalCount += 1;
+        LevelManager.instance.canUseSignal = true;
+        DiverMovement.instance.OnSignal(true);
+        DiverMovement.instance.signalCount = 0;
+        LevelManager.instance.canUseSignal = false;
+        //FishMouth.instance.CloseMouth(-8.8f);
+        FishMouth.instance.CloseMouth(-12.5f);
     }
 
     private void OnTriggerEnter2D(Collider2D other)

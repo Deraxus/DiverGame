@@ -196,3 +196,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::signalBonusLogic
   amplitude: 0.3
   frequency: 2
+  onTakenSound: {fileID: 8300000, guid: be94d75e62dafc146bd2248808e07afb, type: 3}
